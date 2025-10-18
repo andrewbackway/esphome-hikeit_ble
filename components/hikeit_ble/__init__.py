@@ -16,7 +16,7 @@ ICON_LOCK = "mdi:lock"
 ICON_MONITOR = "mdi:monitor"
 ICON_CAR = "mdi:car"
 
-DEPENDENCIES = ["ble_client"]
+DEPENDENCIES = ["ble_client", "select", "number", "switch", "button", "text_sensor"]
 CODEOWNERS = ["@andrewbackway"]
 
 # Component namespace
