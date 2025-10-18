@@ -1,19 +1,19 @@
 
 # HIKE IT BLE ESPHome Component
 
-Full-featured BLE integration for HIKE IT throttle controllers.
+Full-featured BLE integration for HIKE IT throttle controllers, may also work for other branded throttle controllers.
 
 ## Features
 
-- ✅ Auto-connect on boot with automatic reconnection
-- ✅ Speed model control (10 modes: Economy, Normal, Cruise, Sport, ke IT, Auto, Launch, Anti-Slip, Valet, SL)
-- ✅ Step adjustment for each speed mode
-- ✅ Lock/Unlock with PIN
-- ✅ Screen on/off toggle button
-- ✅ Auto mode toggle button
-- ✅ Status sensor with connection state
-- ✅ Full protocol implementation with message parsing
-- ✅ Automation triggers (on_connected, on_disconnected, on_verified, _message)
+- Auto-connect on boot with automatic reconnection
+- Speed model control (10 modes: Economy, Normal, Cruise, Sport, Hike IT, Auto, Launch, Anti-Slip, Valet, SL)
+- Step adjustment for each speed mode
+- Lock/Unlock with PIN
+- Screen on/off toggle button
+- Auto mode toggle button
+- Status sensor with connection state
+- Full protocol implementation with message parsing
+- Automation triggers (on_connected, on_disconnected, on_verified, message)
 
 ## Installation
 
