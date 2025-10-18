@@ -1,11 +1,6 @@
 #include "hikeit_ble.h"
 #include "esphome/core/log.h"
 #include "esphome/core/helpers.h"
-#include "esphome/components/select/select.h" 
-#include "esphome/components/switch/switch.h" 
-#include "esphome/components/text_sensor/text_sensor.h" 
-#include "esphome/components/button/button.h"  
-#include "esphome/components/number/number.h"  
 
 namespace esphome {
 namespace hikeit_ble {

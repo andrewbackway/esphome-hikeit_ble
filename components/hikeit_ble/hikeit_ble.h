@@ -19,9 +19,10 @@ static const char *NOTIFY_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb";
 // Protocol constants
 static const uint8_t HEADER_BYTE_1 = 0xAA;
 static const uint8_t HEADER_BYTE_2 = 0x55;
-static const uint8_t MESSAGE_LENGTH = 19;  // 19 bytes = 38 hex chars
+static const uint8_t MESSAGE_LENGTH = 19;
 
-// Forward declarations
+// Forward declarations for Entity classes (defined elsewhere, e.g., in their own component files or core)
+// NOTE: These are only needed because they are used as pointers in HikeITBLEComponent below.
 class HikeITSpeedSelect;
 class HikeITStepNumber;
 class HikeITLockedSwitch;
@@ -85,30 +86,10 @@ enum ConnectionState {
   STATE_ERROR
 };
 
-// Automation triggers
-class ConnectedTrigger : public Trigger<> {
- public:
-  explicit ConnectedTrigger(HikeITBLEComponent *parent) { parent->add_on_connected_callback([this]() { this->trigger(); }); }
-};
 
-class DisconnectedTrigger : public Trigger<> {
- public:
-  explicit DisconnectedTrigger(HikeITBLEComponent *parent) { parent->add_on_disconnected_callback([this]() { this->trigger(); }); }
-};
-
-class VerifiedTrigger : public Trigger<> {
- public:
-  explicit VerifiedTrigger(HikeITBLEComponent *parent) { parent->add_on_verified_callback([this]() { this->trigger(); }); }
-};
-
-class MessageReceivedTrigger : public Trigger<std::string> {
- public:
-  explicit MessageReceivedTrigger(HikeITBLEComponent *parent) {
-    parent->add_on_message_callback([this](const std::string &msg) { this->trigger(msg); });
-  }
-};
-
-// Main component class
+// ------------------------------------------------------------------
+// Main component class - DEFINED FIRST
+// ------------------------------------------------------------------
 class HikeITBLEComponent : public Component, public ble_client::BLEClientNode {
  public:
   HikeITBLEComponent() = default;
@@ -128,7 +109,7 @@ class HikeITBLEComponent : public Component, public ble_client::BLEClientNode {
   void set_address(const uint8_t *address);
   void set_pin(const std::string &pin) { this->pin_ = pin; }
   
-  // Entity setters
+  // Entity setters (using forward declared types)
   void set_speed_select(HikeITSpeedSelect *select) { this->speed_select_ = select; }
   void set_step_number(HikeITStepNumber *number) { this->step_number_ = number; }
   void set_locked_switch(HikeITLockedSwitch *sw) { this->locked_switch_ = sw; }
@@ -152,7 +133,7 @@ class HikeITBLEComponent : public Component, public ble_client::BLEClientNode {
   const ParsedMessage& get_last_message() const { return this->last_message_; }
   const std::string& get_pin() const { return this->pin_; }
   
-  // Automation callbacks
+  // Automation callbacks (These are now fully visible)
   void add_on_connected_callback(std::function<void()> &&callback) {
     this->connected_callbacks_.add(std::move(callback));
   }
@@ -198,7 +179,7 @@ class HikeITBLEComponent : public Component, public ble_client::BLEClientNode {
   ParsedMessage last_message_;
   bool has_cached_state_{false};
   uint32_t last_connection_attempt_{0};
-  uint32_t reconnect_delay_{5000};  // 5 seconds
+  uint32_t reconnect_delay_{5000};
   
   // BLE handles
   uint16_t service_handle_{0};
@@ -223,6 +204,34 @@ class HikeITBLEComponent : public Component, public ble_client::BLEClientNode {
   CallbackManager<void()> verified_callbacks_;
   CallbackManager<void(const std::string &)> message_callbacks_;
 };
+
+// ------------------------------------------------------------------
+// Automation triggers - DEFINED SECOND
+// ------------------------------------------------------------------
+
+class ConnectedTrigger : public Trigger<> {
+ public:
+  // HikeITBLEComponent is now fully defined, resolving the error
+  explicit ConnectedTrigger(HikeITBLEComponent *parent) { parent->add_on_connected_callback([this]() { this->trigger(); }); }
+};
+
+class DisconnectedTrigger : public Trigger<> {
+ public:
+  explicit DisconnectedTrigger(HikeITBLEComponent *parent) { parent->add_on_disconnected_callback([this]() { this->trigger(); }); }
+};
+
+class VerifiedTrigger : public Trigger<> {
+ public:
+  explicit VerifiedTrigger(HikeITBLEComponent *parent) { parent->add_on_verified_callback([this]() { this->trigger(); }); }
+};
+
+class MessageReceivedTrigger : public Trigger<std::string> {
+ public:
+  explicit MessageReceivedTrigger(HikeITBLEComponent *parent) {
+    parent->add_on_message_callback([this](const std::string &msg) { this->trigger(msg); });
+  }
+};
+
 
 }  // namespace hikeit_ble
 }  // namespace esphome
