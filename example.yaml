@@ -1,0 +1,173 @@
+substitutions:
+  device_name: hikeit-hikeit
+  friendly_name: "HIKE IT Bike"
+  # IMPORTANT: Replace with your device's MAC address!
+  hikeit_mac_address: "AA:BB:CC:DD:EE:FF"
+  # Set your PIN (1-4 digits, used for lock/unlock)
+  hikeit_pin: "123"
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+  platform_version: 2025.10.1  # Latest version as confirmed
+  
+  # Lolin ESP32-S3 specific configuration
+  platformio_options:
+    board_build.flash_mode: dio
+    board_build.arduino.memory_type: qio_opi
+
+esp32:
+  board: lolin_s3
+  framework:
+    type: esp-idf
+    version: 5.3.2  # Latest stable IDF version
+    platform_version: 6.9.0
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    # Reduce BLE spam
+    esp32_ble: INFO
+    esp32_ble_tracker: INFO
+    # Keep hikeit detailed
+    hikeit_ble: DEBUG
+
+# WiFi configuration
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  
+  # Enable fallback hotspot
+  ap:
+    ssid: "${friendly_name} Fallback"
+    password: !secret ap_password
+
+# Captive portal for initial setup
+captive_portal:
+
+# Web server (optional, for debugging)
+web_server:
+  port: 80
+
+# BLE Client setup
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+ble_client:
+  - mac_address: ${hikeit_mac_address}
+    id: hikeit_ble_client
+    auto_connect: true
+
+external_components:
+   - source: github://andrewbackway/esphome-hikeit_ble@main
+
+# ====================================================================================
+# HIKE IT BLE Component Configuration
+# ====================================================================================
+
+hikeit_ble:
+  id: hikeit_hikeit
+  ble_client_id: hikeit_ble_client
+  mac_address: ${hikeit_mac_address}
+  pin: ${hikeit_pin}
+  
+  # Automation triggers
+  on_connected:
+    - logger.log:
+        format: "🔌 Hikeit connected!"
+        level: INFO
+    - homeassistant.event:
+        event: esphome.hikeit_connected
+        data:
+          device: ${device_name}
+  
+  on_disconnected:
+    - logger.log:
+        format: "⚠️ Hikeit disconnected!"
+        level: WARN
+    - homeassistant.event:
+        event: esphome.hikeit_disconnected
+        data:
+          device: ${device_name}
+  
+  on_verified:
+    - logger.log:
+        format: "✅ Hikeit verified and ready!"
+        level: INFO
+    - homeassistant.event:
+        event: esphome.hikeit_verified
+        data:
+          device: ${device_name}
+  
+  on_message:
+    - lambda: |-
+        ESP_LOGV("hikeit", "Raw message: %s", message.c_str());
+  
+  # Speed Model Select
+  speed_model:
+    name: "Speed Model"
+    id: hikeit_speed_model
+    icon: "mdi:speedometer"
+    on_value:
+      - logger.log:
+          format: "Speed model changed to: %s"
+          args: [ 'x.c_str()' ]
+      - homeassistant.event:
+          event: esphome.hikeit_speed_changed
+          data:
+            model: !lambda 'return x;'
+  
+  # Step Adjustment Number
+  step_adjustment:
+    name: "Step Adjustment"
+    id: hikeit_step
+    icon: "mdi:tune-vertical"
+    min_value: 0
+    max_value: 15
+    step: 1
+    mode: slider
+    on_value:
+      - logger.log:
+          format: "Step adjusted to: %.0f"
+          args: [ 'x' ]
+  
+  # Lock/Unlock Switch
+  locked:
+    name: "Device Locked"
+    id: hikeit_locked
+    icon: "mdi:lock"
+    device_class: lock
+    on_turn_on:
+      - logger.log: "🔒 Throttle locked"
+      - homeassistant.event:
+          event: esphome.hikeit_locked
+    on_turn_off:
+      - logger.log: "🔓 Throttle unlocked"
+      - homeassistant.event:
+          event: esphome.hikeit_unlocked
+  
+  # Screen Command Button
+  screen_command:
+    name: "Screen"
+    id: hikeit_screen
+    icon: "mdi:monitor"
+    on_press:
+      - logger.log: "📺 Screen command sent"
+  
+  # Auto Mode Button
+  auto_command:
+    name: "Auto Mode"
+    id: hikeit_auto
+    icon: "mdi:car-cruise-control"
+    on_press:
+      - logger.log: "🤖 Auto mode toggled"
+  
+  # Status Sensor
+  status:
+    name: "Connection Status"
+    id: hikeit_status
+    icon: "mdi:connection"

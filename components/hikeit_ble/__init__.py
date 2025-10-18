@@ -7,13 +7,14 @@ from esphome.const import (
     CONF_MAC_ADDRESS,
     CONF_NAME,
     CONF_TRIGGER_ID,
-    ICON_SPEEDOMETER,
-    ICON_TUNE,
-    ICON_LOCK,
-    ICON_MONITOR,
-    ICON_CAR,
     DEVICE_CLASS_EMPTY,
 )
+
+ICON_SPEEDOMETER = "mdi:speedometer"
+ICON_TUNE = "mdi:tune"
+ICON_LOCK = "mdi:lock"
+ICON_MONITOR = "mdi:monitor"
+ICON_CAR = "mdi:car"
 
 DEPENDENCIES = ["ble_client"]
 CODEOWNERS = ["@andrewbackway"]
