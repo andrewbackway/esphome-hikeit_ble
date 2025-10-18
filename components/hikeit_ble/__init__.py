@@ -16,8 +16,9 @@ ICON_LOCK = "mdi:lock"
 ICON_MONITOR = "mdi:monitor"
 ICON_CAR = "mdi:car"
 
-DEPENDENCIES = ["ble_client", "select", "number", "switch", "button", "text_sensor"]
+DEPENDENCIES = ["ble_client"]
 CODEOWNERS = ["@andrewbackway"]
+AUTO_LOAD = ["select", "number", "switch", "button", "text_sensor"]
 
 # Component namespace
 hikeit_ble_ns = cg.esphome_ns.namespace("hikeit_ble")
