@@ -1,27 +1,11 @@
-substitutions:
-  device_name: hikeit-hikeit
-  friendly_name: "HIKE IT Bike"
-  # IMPORTANT: Replace with your device's MAC address!
-  hikeit_mac_address: "AA:BB:CC:DD:EE:FF"
-  # Set your PIN (1-4 digits, used for lock/unlock)
-  hikeit_pin: "123"
-
 esphome:
-  name: ${device_name}
-  friendly_name: ${friendly_name}
-  platform_version: 2025.10.1  # Latest version as confirmed
+  name: hikeit
+  friendly_name: Hikeit
   
-  # Lolin ESP32-S3 specific configuration
-  platformio_options:
-    board_build.flash_mode: dio
-    board_build.arduino.memory_type: qio_opi
-
 esp32:
   board: lolin_s3
   framework:
     type: esp-idf
-    version: 5.3.2  # Latest stable IDF version
-    platform_version: 6.9.0
 
 # Enable logging
 logger:
@@ -38,11 +22,6 @@ wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
   
-  # Enable fallback hotspot
-  ap:
-    ssid: "${friendly_name} Fallback"
-    password: !secret ap_password
-
 # Captive portal for initial setup
 captive_portal:
 
@@ -72,8 +51,8 @@ external_components:
 hikeit_ble:
   id: hikeit_hikeit
   ble_client_id: hikeit_ble_client
-  mac_address: ${hikeit_mac_address}
-  pin: ${hikeit_pin}
+  mac_address: !secret hikeit_mac_address
+  pin: !secret hikeit_pin
   
   # Automation triggers
   on_connected:
@@ -109,26 +88,23 @@ hikeit_ble:
   
   # Speed Model Select
   speed_model:
-    name: "Speed Model"
+    name: "Model"
     id: hikeit_speed_model
     icon: "mdi:speedometer"
     on_value:
       - logger.log:
-          format: "Speed model changed to: %s"
+          format: "Model changed to: %s"
           args: [ 'x.c_str()' ]
       - homeassistant.event:
           event: esphome.hikeit_speed_changed
           data:
             model: !lambda 'return x;'
   
-  # Step Adjustment Number
+ # Step Adjustment Number
   step_adjustment:
     name: "Step Adjustment"
     id: hikeit_step
     icon: "mdi:tune-vertical"
-    min_value: 0
-    max_value: 15
-    step: 1
     mode: slider
     on_value:
       - logger.log:
@@ -140,31 +116,22 @@ hikeit_ble:
     name: "Device Locked"
     id: hikeit_locked
     icon: "mdi:lock"
-    device_class: lock
     on_turn_on:
-      - logger.log: "🔒 Throttle locked"
+      - logger.log: "🔒 Hike IT locked"
       - homeassistant.event:
           event: esphome.hikeit_locked
     on_turn_off:
-      - logger.log: "🔓 Throttle unlocked"
+      - logger.log: "🔓 Hike IT unlocked"
       - homeassistant.event:
           event: esphome.hikeit_unlocked
   
   # Screen Command Button
   screen_command:
-    name: "Screen"
+    name: "Screen Toggle"
     id: hikeit_screen
     icon: "mdi:monitor"
     on_press:
-      - logger.log: "📺 Screen command sent"
-  
-  # Auto Mode Button
-  auto_command:
-    name: "Auto Mode"
-    id: hikeit_auto
-    icon: "mdi:car-cruise-control"
-    on_press:
-      - logger.log: "🤖 Auto mode toggled"
+      - logger.log: "📺 Screen toggle command sent"
   
   # Status Sensor
   status:
