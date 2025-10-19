@@ -1,6 +1,6 @@
 #pragma once
 #include "esphome/components/button/button.h"
-#include "../hikeit_ble.h"
+#include "hikeit_ble.h"
 
 namespace esphome {
 namespace hikeit_ble {
