@@ -10,9 +10,7 @@ Full-featured BLE integration for HIKE IT throttle controllers, may also work fo
 - Step adjustment for each speed mode
 - Lock/Unlock with PIN
 - Screen on/off toggle button
-- Auto mode toggle button
 - Status sensor with connection state
-- Full protocol implementation with message parsing
 - Automation triggers (on_connected, on_disconnected, on_verified, message)
 
 ## Installation
@@ -28,34 +26,148 @@ python test\hikeit_ble.py
 ### 3. Configure ESPHome
 Use the example YAML below, replacing the MAC address with yours.
 
+Configure secrets for hikeit_mac_address and hikeit_pin
 
-## Home Assistant Integration
-
-Once flashed, the device will appear in Home Assistant with the llowing entities:
-
-- **Select: Speed Model** - Choose from 10 speed modes
-- **Number: Step Adjustment** - Fine-tune step value (0-15)
-- **Switch: Device Locked** - Lock/unlock with PIN (4 digits)
-- **Button: Screen** - Trigger screen on / off
-- **Button: Auto Mode** - Toggle automatic mode
-- **Text Sensor: Device Status** - Shows connection state
-
-## Usage Examples
-
-### Change Speed Mode
 ```yaml
-automation:
-  - alias: "Set Sport Mode"
-    trigger:
-      - platform: state
-        entity_id: binary_sensor.go_fast
-        to: "on"
-    action:
-      - service: select.select_option
-        target:
-          entity_id: select.speed_model
+esphome:
+  name: hikeit
+  friendly_name: Hikeit
+  
+esp32:
+  board: lolin_s3
+  framework:
+    type: esp-idf
+
+# Enable logging
+logger:
+  level: DEBUG
+  logs:
+    # Reduce BLE spam
+    esp32_ble: INFO
+    esp32_ble_tracker: INFO
+    # Keep hikeit detailed
+    hikeit_ble: DEBUG
+
+# WiFi configuration
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+  
+# Captive portal for initial setup
+captive_portal:
+
+# Web server (optional, for debugging)
+web_server:
+
+# BLE Client setup
+esp32_ble_tracker:
+  scan_parameters:
+    interval: 1100ms
+    window: 1100ms
+    active: true
+
+ble_client:
+  - mac_address: !secret hikeit_mac_address
+    id: hikeit_ble_client
+    auto_connect: true
+
+external_components:
+   - source: github://andrewbackway/esphome-hikeit_ble@main
+
+# ====================================================================================
+# HIKE IT BLE Component Configuration
+# ====================================================================================
+
+hikeit_ble:
+  id: hikeit_hikeit
+  ble_client_id: hikeit_ble_client
+  mac_address: !secret hikeit_mac_address
+  pin: !secret hikeit_pin
+  
+  # Automation triggers
+  on_connected:
+    - logger.log:
+        format: "🔌 Hikeit connected!"
+        level: INFO
+    - homeassistant.event:
+        event: esphome.hikeit_connected
         data:
-          option: "Sport"
+          device: ${device_name}
+  
+  on_disconnected:
+    - logger.log:
+        format: "⚠️ Hikeit disconnected!"
+        level: WARN
+    - homeassistant.event:
+        event: esphome.hikeit_disconnected
+        data:
+          device: ${device_name}
+  
+  on_verified:
+    - logger.log:
+        format: "✅ Hikeit verified and ready!"
+        level: INFO
+    - homeassistant.event:
+        event: esphome.hikeit_verified
+        data:
+          device: ${device_name}
+  
+  on_message:
+    - lambda: |-
+        ESP_LOGV("hikeit", "Raw message: %s", message.c_str());
+  
+  # Speed Model Select
+  speed_model:
+    name: "Model"
+    id: hikeit_speed_model
+    icon: "mdi:speedometer"
+    on_value:
+      - logger.log:
+          format: "Model changed to: %s"
+          args: [ 'x.c_str()' ]
+      - homeassistant.event:
+          event: esphome.hikeit_speed_changed
+          data:
+            model: !lambda 'return x;'
+  
+ # Step Adjustment Number
+  step_adjustment:
+    name: "Step Adjustment"
+    id: hikeit_step
+    icon: "mdi:tune-vertical"
+    mode: slider
+    on_value:
+      - logger.log:
+          format: "Step adjusted to: %.0f"
+          args: [ 'x' ]
+  
+  # Lock/Unlock Switch
+  locked:
+    name: "Device Locked"
+    id: hikeit_locked
+    icon: "mdi:lock"
+    on_turn_on:
+      - logger.log: "🔒 Hike IT locked"
+      - homeassistant.event:
+          event: esphome.hikeit_locked
+    on_turn_off:
+      - logger.log: "🔓 Hike IT unlocked"
+      - homeassistant.event:
+          event: esphome.hikeit_unlocked
+  
+  # Screen Command Button
+  screen_command:
+    name: "Screen Toggle"
+    id: hikeit_screen
+    icon: "mdi:monitor"
+    on_press:
+      - logger.log: "📺 Screen toggle command sent"
+  
+  # Status Sensor
+  status:
+    name: "Connection Status"
+    id: hikeit_status
+    icon: "mdi:connection"
 ```
 
 
@@ -88,35 +200,6 @@ automation:
 2. **Lock/Unlock fails:**
    - Verify PIN in YAML matches device PIN
    - Check logs for "Wrong PIN" status
-
-## Advanced Configuration
-
-### Custom Automations with Triggers
-
-```yaml
-hikeit_ble:
-  id: my_hikeit
-  mac_address: "AA:BB:CC:DD:EE:FF"
-  pin: "123"
-  
-  on_connected:
-    - logger.log: "Device connected!"
-    - homeassistant.event:
-        event: esphome.hikeit_connected
-  
-  on_disconnected:
-    - logger.log: "Device disconnected!"
-    - homeassistant.event:
-        event: esphome.hikeit_disconnected
-  
-  on_verified:
-    - logger.log: "Device verified!"
-    - switch.turn_on: status_led
-  
-  on_message:
-    - lambda: |-
-        ESP_LOGD("hikeit", "Message: %s", message.c_str());
-```
 
 ## Protocol Details
 
