@@ -6,11 +6,11 @@
 #include "esphome/components/switch/switch.h"
 #include "esphome/components/text_sensor/text_sensor.h"
 
-#include "button/hikeit_button.h"
-#include "number/hikeit_step_number.h"
-#include "select/hikeit_speed_select.h"
-#include "switch/hikeit_locked_switch.h"
-#include "text_sensor/hikeit_status_sensor.h"
+#include "hikeit_button.h"
+#include "hikeit_step_number.h"
+#include "hikeit_speed_select.h"
+#include "hikeit_locked_switch.h"
+#include "hikeit_status_sensor.h"
 
 namespace esphome {
 namespace hikeit_ble {
