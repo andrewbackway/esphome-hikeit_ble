@@ -178,8 +178,8 @@ async def to_code(config):
     await cg.register_component(var, config)
     await ble_client.register_ble_node(var, config)
     
-    mac_bytes = [int(x, 16) for x in config[CONF_MAC_ADDRESS].split(':')]
-    cg.add(var.set_address(cg.MAC_ADDR.format(*mac_bytes)))
+    # Set MAC Address
+    cg.add(var.set_address(cg.mac_addr.format(config[CONF_MAC_ADDRESS])))
     
     # Set PIN
     cg.add(var.set_pin(config[CONF_PIN]))
