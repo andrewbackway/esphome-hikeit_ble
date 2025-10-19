@@ -56,7 +56,7 @@ SpeedModel string_to_speed_model(const std::string &str) {
   if (str == "Anti-Slip") return SPEED_ANTI_SLIP;
   if (str == "Valet") return SPEED_VALET;
   if (str == "SL") return SPEED_SL;
-  return SPEED_ECONOMY;
+  return SPEED_NORMAL;
 }
 
 void HikeITBLEComponent::setup() {

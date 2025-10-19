@@ -98,7 +98,7 @@ CONF_ON_MESSAGE = "on_message"
 
 # Speed model options
 SPEED_MODELS = [
-    "Eco/4x4",
+    "Eco 4x4",
     "Off",
     "Cruise",
     "Sport",
