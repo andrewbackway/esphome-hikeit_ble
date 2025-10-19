@@ -200,7 +200,7 @@ async def to_code(config):
     if CONF_STEP_ADJUSTMENT in config:
         conf = config[CONF_STEP_ADJUSTMENT]
         sens = cg.new_Pvariable(conf[CONF_ID])
-        await number.register_number(sens, conf, min_value=0, max_value=15, step=1)
+        await number.register_number(sens, conf, min_value=1, max_value=10, step=1)
         cg.add(sens.set_parent(var))
         cg.add(var.set_step_number(sens))
     
@@ -219,13 +219,23 @@ async def to_code(config):
         cg.add(sens.set_command_type(0))  # Screen command
         cg.add(var.set_screen_button(sens))
     
-    if CONF_AUTO_COMMAND in config:
-        conf = config[CONF_AUTO_COMMAND]
-        sens = cg.new_Pvariable(conf[CONF_ID])
-        await button.register_button(sens, conf)
-        cg.add(sens.set_parent(var))
-        cg.add(sens.set_command_type(1))  # Auto command
-        cg.add(var.set_auto_button(sens))
+    # Auto Transmission - Shouldn't be changed mid driving
+    #if CONF_AUTO_COMMAND in config:
+    #    conf = config[CONF_AUTO_COMMAND]
+    #    sens = cg.new_Pvariable(conf[CONF_ID])
+    #    await button.register_button(sens, conf)
+    #    cg.add(sens.set_parent(var))
+    #    cg.add(sens.set_command_type(1))  # Auto command
+    #    cg.add(var.set_auto_button(sens))
+
+    # Sample YAML for Auto Transmission
+    # Auto Transmission - Button
+    # auto_command:
+    #  name: "Auto Transmission"
+    #  id: bike_auto
+    #  icon: "mdi:car-cruise-control"
+    #  on_press:
+    #    - logger.log: "🤖 Auto mode toggled"
     
     if CONF_STATUS in config:
         conf = config[CONF_STATUS]
