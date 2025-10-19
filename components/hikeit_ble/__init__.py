@@ -179,11 +179,13 @@ async def to_code(config):
     await ble_client.register_ble_node(var, config)
     
     # Set MAC address
-    #mac = str(config[CONF_MAC_ADDRESS]).replace(":", "")
-    #mac_bytes = [int(mac[i:i+2], 16) for i in range(0, 12, 2)]
-    #cg.add(var.set_address(mac_bytes))
-    cg.add(var.set_address(cg.MAC_ADDR.format(config[CONF_MAC_ADDRESS])))
-
+    mac_str = str(config[CONF_MAC_ADDRESS])
+    mac_bytes = [int(b, 16) for b in mac_str.split(":")]
+    mac_int = 0
+    for b in mac_bytes:
+        mac_int = (mac_int << 8) | b
+    cg.add(var.set_address(mac_int))
+    
     # Set PIN
     cg.add(var.set_pin(config[CONF_PIN]))
     
