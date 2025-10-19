@@ -43,6 +43,8 @@ enum SpeedModel : uint8_t {
   SPEED_SL = 9
 };
 
+SpeedModel string_to_speed_model(const std::string &value);
+
 // Parsed message structure
 struct ParsedMessage {
   uint8_t count;
