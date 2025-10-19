@@ -98,16 +98,16 @@ CONF_ON_MESSAGE = "on_message"
 
 # Speed model options
 SPEED_MODELS = [
-    "Economy",
-    "Normal",
+    "Eco/4x4",
+    "Off",
     "Cruise",
     "Sport",
     "Hike IT",
     "Auto",
     "Launch",
     "Anti-Slip",
-    "Valet",
-    "SL"
+    "Valet"
+    #"SL" Unknown does not correspond to option on device
 ]
 
 # Component configuration schema

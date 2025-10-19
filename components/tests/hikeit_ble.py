@@ -22,8 +22,8 @@ SCAN_PREFIX = "HIKE"
 
 class SpeedModel(Enum):
     """Speed model enumeration"""
-    ECONOMY = (0, "Economy")
-    NORMAL = (1, "Normal")
+    ECONOMY = (0, "Eco 4x4")
+    NORMAL = (1, "Off")
     CRUISE = (2, "Cruise")
     SPORT = (3, "Sport")
     HIKE_IT = (4, "Hike IT")

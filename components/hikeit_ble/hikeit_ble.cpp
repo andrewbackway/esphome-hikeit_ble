@@ -30,8 +30,8 @@ std::string format_hex(const uint8_t *data, size_t len) {
 // Helper to convert speed model to string
 const char* speed_model_to_string(SpeedModel model) {
   switch (model) {
-    case SPEED_ECONOMY: return "Economy";
-    case SPEED_NORMAL: return "Normal";
+    case SPEED_ECONOMY: return "Eco 4x4";
+    case SPEED_NORMAL: return "Off";
     case SPEED_CRUISE: return "Cruise";
     case SPEED_SPORT: return "Sport";
     case SPEED_HIKE_IT: return "Hike IT";
@@ -46,8 +46,8 @@ const char* speed_model_to_string(SpeedModel model) {
 
 // Helper to convert string to speed model
 SpeedModel string_to_speed_model(const std::string &str) {
-  if (str == "Economy") return SPEED_ECONOMY;
-  if (str == "Normal") return SPEED_NORMAL;
+  if (str == "Eco 4x4") return SPEED_ECONOMY;
+  if (str == "Off") return SPEED_NORMAL;
   if (str == "Cruise") return SPEED_CRUISE;
   if (str == "Sport") return SPEED_SPORT;
   if (str == "Hike IT") return SPEED_HIKE_IT;
