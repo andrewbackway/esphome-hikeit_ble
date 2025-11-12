@@ -7,7 +7,7 @@
 #include <vector>
 #include <string>
 
-#include "esphome/components/switch/switch.h
+#include "esphome/components/switch/switch.h"
 
 namespace esphome {
 namespace hikeit_ble {
