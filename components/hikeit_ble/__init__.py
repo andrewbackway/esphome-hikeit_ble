@@ -103,8 +103,8 @@ CONF_CONNECT_SWITCH = "connect_switch"
 
 # Speed model options
 SPEED_MODELS = [
-    "Eco 4x4",
     "Off",
+    "Eco 4x4",
     "Cruise",
     "Sport",
     "Hike IT",
