@@ -16,18 +16,13 @@ ICON_LOCK = "mdi:lock"
 ICON_MONITOR = "mdi:monitor"
 ICON_CAR = "mdi:car"
 
-CONF_CONNECT_SWITCH = "connect_switch"
-
 DEPENDENCIES = ["ble_client"]
 CODEOWNERS = ["@andrewbackway"]
 AUTO_LOAD = ["select", "number", "switch", "button", "text_sensor"]
 
 # Component namespace
 hikeit_ble_ns = cg.esphome_ns.namespace("hikeit_ble")
-
-hikeit_ble_ns = cg.esphome_ns.namespace("hikeit_ble")
 HikeITBLEComponent = hikeit_ble_ns.class_("HikeITBLEComponent", cg.Component)
-
 
 
 # Main component class
@@ -103,6 +98,9 @@ CONF_ON_DISCONNECTED = "on_disconnected"
 CONF_ON_VERIFIED = "on_verified"
 CONF_ON_MESSAGE = "on_message"
 
+CONF_CONNECT_SWITCH = "connect_switch"
+
+
 # Speed model options
 SPEED_MODELS = [
     "Eco 4x4",
@@ -124,6 +122,7 @@ CONFIG_SCHEMA = (
             cv.GenerateID(): cv.declare_id(HikeITBLEComponent),
             cv.Required(CONF_MAC_ADDRESS): cv.mac_address,
             cv.Optional(CONF_PIN, default="123"): cv.string,
+            cv.Optional(CONF_CONNECT_SWITCH): cv.use_id(switch.Switch),
             
             # Entity configs
             cv.Optional(CONF_SPEED_MODEL): select.select_schema(
@@ -151,7 +150,6 @@ CONFIG_SCHEMA = (
                 HikeITStatusSensor,
             ),
 
-            cv.Optional(CONF_CONNECT_SWITCH): cv.use_id(switch.Switch),
             
             # Automation triggers
             cv.Optional(CONF_ON_CONNECTED): automation.validate_automation(
