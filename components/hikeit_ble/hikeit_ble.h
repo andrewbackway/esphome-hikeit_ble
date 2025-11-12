@@ -33,8 +33,8 @@ class HikeITStatusSensor;
 
 // Speed model enumeration
 enum SpeedModel : uint8_t {
-  SPEED_ECONOMY = 0,
   SPEED_NORMAL = 1,
+  SPEED_ECONOMY = 0,
   SPEED_CRUISE = 2,
   SPEED_SPORT = 3,
   SPEED_HIKE_IT = 4,

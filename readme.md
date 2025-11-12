@@ -229,3 +229,8 @@ MIT License - Free to use and modify
 
 Based on HIKE IT Android app protocol
 
+
+## DevNote
+
+Weird sensors at top level is an issue with pathing...
+
