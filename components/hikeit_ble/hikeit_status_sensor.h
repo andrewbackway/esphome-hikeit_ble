@@ -9,6 +9,10 @@ class HikeITStatusSensor : public text_sensor::TextSensor, public Component {
  public:
   void set_parent(HikeITBLEComponent *parent) { this->parent_ = parent; }
   
+  void setup() override {
+    this->publish_state("Offline");
+  }
+  
  protected:
   HikeITBLEComponent *parent_{nullptr};
 };
