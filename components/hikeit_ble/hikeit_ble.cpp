@@ -243,25 +243,29 @@ void HikeITBLEComponent::update_status_text() {
   if (this->status_sensor_ == nullptr) return;
 
   std::string status;
-  switch (this->state_) {
-    case STATE_DISCONNECTED:
-      status = "Disconnected";
-      break;
-    case STATE_CONNECTING:
-      status = "Connecting...";
-      break;
-    case STATE_CONNECTED:
-      status = "Connected";
-      break;
-    case STATE_VERIFYING:
-      status = "Verifying...";
-      break;
-    case STATE_VERIFIED:
-      status = "Verified";
-      break;
-    case STATE_ERROR:
-      status = "Error";
-      break;
+  if (!this->connection_allowed_()) {
+    status = "Offline";
+  } else {
+    switch (this->state_) {
+      case STATE_DISCONNECTED:
+        status = "Disconnected";
+        break;
+      case STATE_CONNECTING:
+        status = "Connecting...";
+        break;
+      case STATE_CONNECTED:
+        status = "Connected";
+        break;
+      case STATE_VERIFYING:
+        status = "Verifying...";
+        break;
+      case STATE_VERIFIED:
+        status = "Verified";
+        break;
+      case STATE_ERROR:
+        status = "Error";
+        break;
+    }
   }
 
   this->status_sensor_->publish_state(status);
