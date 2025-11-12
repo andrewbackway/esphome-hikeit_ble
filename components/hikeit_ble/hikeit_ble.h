@@ -205,7 +205,7 @@ class HikeITBLEComponent : public Component, public ble_client::BLEClientNode {
   HikeITStatusSensor *status_sensor_{nullptr};
 
   switch_::Switch *connect_switch_{nullptr};
-  bool connection_allowed_() const
+  bool connection_allowed_() const;
   
   // Automation callbacks
   CallbackManager<void()> connected_callbacks_;
