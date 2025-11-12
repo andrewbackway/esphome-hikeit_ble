@@ -266,6 +266,9 @@ void HikeITBLEComponent::update_status_text() {
       case STATE_ERROR:
         status = "Error";
         break;
+      default:
+        status = "Offline";
+        break;
     }
   }
 
