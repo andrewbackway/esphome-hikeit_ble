@@ -1,10 +1,5 @@
 #include "hikeit_ble.h"
 
-#include "button/hikeit_button.h"
-#include "number/hikeit_step_number.h"
-#include "select/hikeit_speed_select.h"
-#include "switch/hikeit_locked_switch.h"
-#include "text_sensor/hikeit_status_sensor.h"
 #include "esphome/components/select/select.h"
 #include "esphome/components/switch/switch.h"
 #include "esphome/components/text_sensor/text_sensor.h"
