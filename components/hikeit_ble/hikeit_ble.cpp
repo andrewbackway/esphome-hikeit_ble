@@ -73,6 +73,7 @@ SpeedModel string_to_speed_model(const std::string& str) {
 void HikeITBLEComponent::setup() {
   ESP_LOGCONFIG(TAG, "Setting up HIKE IT BLE...");
   this->set_state(STATE_DISCONNECTED);
+  this->update_status_text();
 }
 
 void HikeITBLEComponent::loop() {
