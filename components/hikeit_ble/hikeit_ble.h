@@ -7,6 +7,8 @@
 #include <vector>
 #include <string>
 
+#include "esphome/components/switch/switch.h
+
 namespace esphome {
 namespace hikeit_ble {
 
@@ -119,6 +121,8 @@ class HikeITBLEComponent : public Component, public ble_client::BLEClientNode {
   void set_auto_button(HikeITButton *btn) { this->auto_button_ = btn; }
   void set_status_sensor(HikeITStatusSensor *sensor) { this->status_sensor_ = sensor; }
   
+  void set_connect_switch(switch_::Switch *sw) { this->connect_switch_ = sw; }
+
   // Command methods
   void send_verify_command();
   void send_disconnect_command();
@@ -199,6 +203,9 @@ class HikeITBLEComponent : public Component, public ble_client::BLEClientNode {
   HikeITButton *screen_button_{nullptr};
   HikeITButton *auto_button_{nullptr};
   HikeITStatusSensor *status_sensor_{nullptr};
+
+  switch_::Switch *connect_switch_{nullptr};
+  bool connection_allowed_() const
   
   // Automation callbacks
   CallbackManager<void()> connected_callbacks_;

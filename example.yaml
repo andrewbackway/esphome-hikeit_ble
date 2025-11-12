@@ -138,3 +138,12 @@ hikeit_ble:
     name: "Connection Status"
     id: hikeit_status
     icon: "mdi:connection"
+
+
+switch:
+  - platform: template
+    id: hikeit_connect
+    name: "HIKE IT Connect"
+    icon: "mdi:bluetooth"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF

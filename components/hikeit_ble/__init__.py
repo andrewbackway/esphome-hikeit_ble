@@ -16,12 +16,19 @@ ICON_LOCK = "mdi:lock"
 ICON_MONITOR = "mdi:monitor"
 ICON_CAR = "mdi:car"
 
+CONF_CONNECT_SWITCH = "connect_switch"
+
 DEPENDENCIES = ["ble_client"]
 CODEOWNERS = ["@andrewbackway"]
 AUTO_LOAD = ["select", "number", "switch", "button", "text_sensor"]
 
 # Component namespace
 hikeit_ble_ns = cg.esphome_ns.namespace("hikeit_ble")
+
+hikeit_ble_ns = cg.esphome_ns.namespace("hikeit_ble")
+HikeITBLEComponent = hikeit_ble_ns.class_("HikeITBLEComponent", cg.Component)
+
+
 
 # Main component class
 HikeITBLEComponent = hikeit_ble_ns.class_(
@@ -143,6 +150,8 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_STATUS): text_sensor.text_sensor_schema(
                 HikeITStatusSensor,
             ),
+
+            cv.Optional(CONF_CONNECT_SWITCH): cv.use_id(switch.Switch),
             
             # Automation triggers
             cv.Optional(CONF_ON_CONNECTED): automation.validate_automation(
@@ -218,7 +227,11 @@ async def to_code(config):
         cg.add(sens.set_parent(var))
         cg.add(sens.set_command_type(0))  # Screen command
         cg.add(var.set_screen_button(sens))
-    
+
+    if CONF_CONNECT_SWITCH in config:
+        sw = await cg.get_variable(config[CONF_CONNECT_SWITCH])
+        cg.add(var.set_connect_switch(sw))
+
     # Auto Transmission - Shouldn't be changed mid driving
     #if CONF_AUTO_COMMAND in config:
     #    conf = config[CONF_AUTO_COMMAND]
