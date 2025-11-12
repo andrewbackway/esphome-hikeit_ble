@@ -671,10 +671,6 @@ void HikeITBLEComponent::parse_type02(const uint8_t* data, ParsedMessage& msg) {
   }
 }
 
-void HikeITBLEComponent::set_connect_switch(switch_::Switch* sw) {
-  this->connect_switch_ = sw;
-}
-
 bool HikeITBLEComponent::connection_allowed_() const {
   // If no switch configured, always allow connection
   if (this->connect_switch_ == nullptr) return true;
