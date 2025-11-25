@@ -1,0 +1,21 @@
+# ESPHome build artifacts
+.esphome/
+build/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.py[cod]
+*$py.class
+
+# Secrets (do not commit)
+secrets.yaml
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
