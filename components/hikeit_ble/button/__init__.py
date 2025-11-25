@@ -10,13 +10,19 @@ ICON_MONITOR = "mdi:monitor"
 
 CONF_COMMAND_TYPE = "command_type"
 
+# Valid command types: 0 = screen toggle, 1 = auto transmission toggle
+COMMAND_TYPE_SCREEN = 0
+COMMAND_TYPE_AUTO = 1
+
 HikeITButton = hikeit_ble_ns.class_("HikeITButton", button.Button, cg.Component)
 
 CONFIG_SCHEMA = (
     button.button_schema(HikeITButton, icon=ICON_MONITOR)
     .extend({
         cv.GenerateID(CONF_HIKEIT_BLE_ID): cv.use_id(HikeITBLEComponent),
-        cv.Optional(CONF_COMMAND_TYPE, default=0): cv.int_,
+        cv.Optional(CONF_COMMAND_TYPE, default=COMMAND_TYPE_SCREEN): cv.one_of(
+            COMMAND_TYPE_SCREEN, COMMAND_TYPE_AUTO, int=True
+        ),
     })
     .extend(cv.COMPONENT_SCHEMA)
 )
@@ -29,7 +35,7 @@ async def to_code(config):
     cg.add(var.set_parent(parent))
     cg.add(var.set_command_type(config[CONF_COMMAND_TYPE]))
     # Register with parent based on command type
-    if config[CONF_COMMAND_TYPE] == 0:
+    if config[CONF_COMMAND_TYPE] == COMMAND_TYPE_SCREEN:
         cg.add(parent.set_screen_button(var))
-    elif config[CONF_COMMAND_TYPE] == 1:
+    elif config[CONF_COMMAND_TYPE] == COMMAND_TYPE_AUTO:
         cg.add(parent.set_auto_button(var))
