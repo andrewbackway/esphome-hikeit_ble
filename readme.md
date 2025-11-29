@@ -6,24 +6,29 @@ Full-featured BLE integration for HIKE IT throttle controllers, may also work fo
 ## Features
 
 - Auto-connect on boot with automatic reconnection
-- Speed model control (10 modes: Economy, Normal, Cruise, Sport, Hike IT, Auto, Launch, Anti-Slip, Valet, SL)
+- Speed model control (9 modes: Off, Eco 4x4, Cruise, Sport, Hike IT, Auto, Launch, Anti-Slip, Valet)
 - Step adjustment for each speed mode
 - Lock/Unlock with PIN
 - Screen on/off toggle button
 - Status sensor with connection state
-- Automation triggers (on_connected, on_disconnected, on_verified, message)
+- Automation triggers (on_connected, on_disconnected, on_verified, on_message)
+
+## Requirements
+
+- ESPHome 2025.11.0 or later
+- ESP32 with BLE support
 
 ## Installation
 
-### 2. Get Your Device MAC Address
+### 1. Get Your Device MAC Address
 Use the Python script first to scan for your device MAC address:
 ```bash
-python test\hikeit_ble.py
+python tests/hikeit_ble.py
 # Choose option 2 to scan for HIKE IT devices
 # Note down the MAC address
 ```
 
-### 3. Configure ESPHome
+### 2. Configure ESPHome
 Use the example YAML below, replacing the MAC address with yours.
 
 Configure secrets for hikeit_mac_address and hikeit_pin
@@ -89,35 +94,29 @@ hikeit_ble:
     - logger.log:
         format: "🔌 Hikeit connected!"
         level: INFO
-    - homeassistant.event:
-        event: esphome.hikeit_connected
-        data:
-          device: ${device_name}
   
   on_disconnected:
     - logger.log:
         format: "⚠️ Hikeit disconnected!"
         level: WARN
-    - homeassistant.event:
-        event: esphome.hikeit_disconnected
-        data:
-          device: ${device_name}
   
   on_verified:
     - logger.log:
         format: "✅ Hikeit verified and ready!"
         level: INFO
-    - homeassistant.event:
-        event: esphome.hikeit_verified
-        data:
-          device: ${device_name}
   
   on_message:
     - lambda: |-
         ESP_LOGV("hikeit", "Raw message: %s", message.c_str());
-  
-  # Speed Model Select
-  speed_model:
+
+# ====================================================================================
+# Platform-based Entity Configuration
+# ====================================================================================
+
+# Speed Model Select
+select:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
     name: "Model"
     id: hikeit_speed_model
     icon: "mdi:speedometer"
@@ -125,13 +124,11 @@ hikeit_ble:
       - logger.log:
           format: "Model changed to: %s"
           args: [ 'x.c_str()' ]
-      - homeassistant.event:
-          event: esphome.hikeit_speed_changed
-          data:
-            model: !lambda 'return x;'
-  
- # Step Adjustment Number
-  step_adjustment:
+
+# Step Adjustment Number
+number:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
     name: "Step Adjustment"
     id: hikeit_step
     icon: "mdi:tune-vertical"
@@ -140,35 +137,99 @@ hikeit_ble:
       - logger.log:
           format: "Step adjusted to: %.0f"
           args: [ 'x' ]
-  
-  # Lock/Unlock Switch
-  locked:
+
+# Lock/Unlock Switch
+switch:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
     name: "Device Locked"
     id: hikeit_locked
     icon: "mdi:lock"
     on_turn_on:
       - logger.log: "🔒 Hike IT locked"
-      - homeassistant.event:
-          event: esphome.hikeit_locked
     on_turn_off:
       - logger.log: "🔓 Hike IT unlocked"
-      - homeassistant.event:
-          event: esphome.hikeit_unlocked
   
-  # Screen Command Button
-  screen_command:
+  # Optional: Connect switch to control BLE connection
+  - platform: template
+    id: hikeit_connect
+    name: "HIKE IT Connect"
+    icon: "mdi:bluetooth"
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
+# Screen Command Button
+button:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
     name: "Screen Toggle"
     id: hikeit_screen
     icon: "mdi:monitor"
     on_press:
       - logger.log: "📺 Screen toggle command sent"
-  
-  # Status Sensor
-  status:
+
+# Status Sensor
+text_sensor:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
     name: "Connection Status"
     id: hikeit_status
     icon: "mdi:connection"
 ```
+
+## Platform Entities
+
+All entities are now configured as platform sensors, which follows the ESPHome 2025.11+ convention:
+
+### Select (Speed Model)
+```yaml
+select:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
+    name: "Model"
+```
+
+Available options: Off, Eco 4x4, Cruise, Sport, Hike IT, Auto, Launch, Anti-Slip, Valet
+
+### Number (Step Adjustment)
+```yaml
+number:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
+    name: "Step Adjustment"
+    mode: slider  # or box
+```
+
+Range: 0-15
+
+### Switch (Lock/Unlock)
+```yaml
+switch:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
+    name: "Device Locked"
+```
+
+Controls device lock state using configured PIN.
+
+### Button (Screen Toggle)
+```yaml
+button:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
+    name: "Screen Toggle"
+    command_type: 0  # 0 = screen, 1 = auto transmission (optional)
+```
+
+### Text Sensor (Connection Status)
+```yaml
+text_sensor:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
+    name: "Connection Status"
+```
+
+Reports: Disconnected, Connecting..., Connected, Verifying..., Verified, Error, Offline
 
 
 ## Troubleshooting
@@ -228,9 +289,4 @@ MIT License - Free to use and modify
 ## Credits
 
 Based on HIKE IT Android app protocol
-
-
-## DevNote
-
-Weird sensors at top level is an issue with pathing...
 

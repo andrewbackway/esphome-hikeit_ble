@@ -37,7 +37,7 @@ esp32_ble_tracker:
     active: true
 
 ble_client:
-  - mac_address: ${hikeit_mac_address}
+  - mac_address: !secret hikeit_mac_address
     id: hikeit_ble_client
     auto_connect: true
 
@@ -85,9 +85,15 @@ hikeit_ble:
   on_message:
     - lambda: |-
         ESP_LOGV("hikeit", "Raw message: %s", message.c_str());
-  
-  # Speed Model Select
-  speed_model:
+
+# ====================================================================================
+# Platform-based Entity Configuration
+# ====================================================================================
+
+# Speed Model Select
+select:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
     name: "Model"
     id: hikeit_speed_model
     icon: "mdi:speedometer"
@@ -99,9 +105,11 @@ hikeit_ble:
           event: esphome.hikeit_speed_changed
           data:
             model: !lambda 'return x;'
-  
- # Step Adjustment Number
-  step_adjustment:
+
+# Step Adjustment Number
+number:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
     name: "Step Adjustment"
     id: hikeit_step
     icon: "mdi:tune-vertical"
@@ -110,9 +118,11 @@ hikeit_ble:
       - logger.log:
           format: "Step adjusted to: %.0f"
           args: [ 'x' ]
-  
-  # Lock/Unlock Switch
-  locked:
+
+# Lock/Unlock Switch and Connect Switch
+switch:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
     name: "Device Locked"
     id: hikeit_locked
     icon: "mdi:lock"
@@ -125,25 +135,27 @@ hikeit_ble:
       - homeassistant.event:
           event: esphome.hikeit_unlocked
   
-  # Screen Command Button
-  screen_command:
-    name: "Screen Toggle"
-    id: hikeit_screen
-    icon: "mdi:monitor"
-    on_press:
-      - logger.log: "📺 Screen toggle command sent"
-  
-  # Status Sensor
-  status:
-    name: "Connection Status"
-    id: hikeit_status
-    icon: "mdi:connection"
-
-
-switch:
   - platform: template
     id: hikeit_connect
     name: "HIKE IT Connect"
     icon: "mdi:bluetooth"
     optimistic: true
     restore_mode: RESTORE_DEFAULT_OFF
+
+# Screen Command Button
+button:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
+    name: "Screen Toggle"
+    id: hikeit_screen
+    icon: "mdi:monitor"
+    on_press:
+      - logger.log: "📺 Screen toggle command sent"
+
+# Status Sensor
+text_sensor:
+  - platform: hikeit_ble
+    hikeit_ble_id: hikeit_hikeit
+    name: "Connection Status"
+    id: hikeit_status
+    icon: "mdi:connection"
