@@ -86,10 +86,6 @@ hikeit_ble:
     - lambda: |-
         ESP_LOGV("hikeit", "Raw message: %s", message.c_str());
 
-# ====================================================================================
-# Platform-based Entity Configuration
-# ====================================================================================
-
 # Speed Model Select
 select:
   - platform: hikeit_ble
